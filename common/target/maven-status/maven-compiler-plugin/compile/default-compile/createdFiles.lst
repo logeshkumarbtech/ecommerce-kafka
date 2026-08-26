@@ -1,0 +1,4 @@
+com\ecommerce\common\event\OrderShippedEvent.class
+com\ecommerce\common\event\OrderPaidEvent.class
+com\ecommerce\common\event\StockReservedEvent.class
+com\ecommerce\common\event\OrderCreatedEvent.class

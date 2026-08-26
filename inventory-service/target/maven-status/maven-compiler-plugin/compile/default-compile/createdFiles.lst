@@ -1,0 +1,3 @@
+com\ecommerce\inventory\InventoryServiceApplication.class
+com\ecommerce\inventory\config\KafkaConfig.class
+com\ecommerce\inventory\listener\InventoryEventListener.class

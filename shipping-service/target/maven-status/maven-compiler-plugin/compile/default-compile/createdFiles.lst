@@ -1,0 +1,3 @@
+com\ecommerce\shipping\listener\ShippingEventListener.class
+com\ecommerce\shipping\config\KafkaConfig.class
+com\ecommerce\shipping\ShippingServiceApplication.class

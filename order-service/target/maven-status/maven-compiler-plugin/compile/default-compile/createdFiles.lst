@@ -1,0 +1,5 @@
+com\ecommerce\order\config\KafkaProducerConfig.class
+com\ecommerce\order\OrderServiceApplication.class
+com\ecommerce\order\controller\OrderController.class
+com\ecommerce\order\dto\OrderRequest.class
+com\ecommerce\order\producer\OrderProducer.class
