@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Order Pipeline — Live Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>🛒 E-Commerce Order Pipeline</h1>
+    <p>Live view of orders flowing through Kafka</p>
+  </header>
+
+  <section class="panel">
+    <h2>Place an Order</h2>
+    <form id="order-form">
+      <input type="text" id="customerId" placeholder="Customer ID" value="cust-1" required>
+      <input type="text" id="productId" placeholder="Product ID" value="prod-42" required>
+      <input type="number" id="quantity" placeholder="Quantity" value="2" min="1" required>
+      <input type="number" id="amount" placeholder="Amount" value="199.99" step="0.01" required>
+      <button type="submit">Place Order</button>
+    </form>
+  </section>
+
+  <section class="panel">
+    <h2>Orders</h2>
+    <div id="orders"></div>
+  </section>
+
+  <div id="toast-container"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>

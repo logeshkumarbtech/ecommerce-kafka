@@ -16,6 +16,7 @@ A microservices-based e-commerce order pipeline built with **Spring Boot** and *
 | Build Tool | Maven (multi-module) |
 | Containerization | Podman / `apache/kafka` official image |
 | API Testing | Hoppscotch |
+| Live Dashboard | Server-Sent Events (SSE) + static HTML/CSS/JS (served by `order-service`) |
 
 ---
 
@@ -26,7 +27,8 @@ ecommerce-kafka/
 ├── compose.yml                 # Kafka container definition (KRaft, single node)
 ├── pom.xml                     # Parent Maven POM
 ├── common/                     # Shared event DTOs (records)
-├── order-service/     :8081    # REST API — entry point, produces order.created
+├── order-service/     :8081    # REST API + live dashboard, produces order.created
+│   └── src/main/resources/static/  # index.html, app.js, style.css — the dashboard UI
 ├── inventory-service/ :8082    # Consumes order.created → produces stock.reserved
 ├── payment-service/   :8083    # Consumes stock.reserved → produces order.paid
 ├── shipping-service/  :8084    # Consumes order.paid → produces order.shipped
@@ -133,6 +135,33 @@ sequenceDiagram
 
 ---
 
+## Live Dashboard
+
+`order-service` also doubles as a lightweight monitoring UI — no separate frontend app is needed.
+
+- **Backend:** `order-service` additionally consumes `stock.reserved`, `order.paid`, and `order.shipped` under its own `order-status-group` consumer group, purely to maintain an in-memory status board (`OrderStatusStore`). This is independent from `payment-group`/`shipping-group`/`notification-group`, so it doesn't interfere with the real pipeline.
+- **Push updates:** `GET /api/orders/stream` is a Server-Sent Events (SSE) endpoint. Every time an order's status changes, all connected browsers receive an `order-update` event instantly.
+- **Frontend:** plain static HTML/CSS/JS served automatically by Spring Boot from `order-service/src/main/resources/static` — no Node/npm/build step required.
+
+```mermaid
+flowchart LR
+    Browser[Browser :8081] -->|POST /api/orders| OrderSvc[order-service]
+    Browser -->|GET /api/orders/stream SSE| OrderSvc
+    OrderSvc -->|order-update events| Browser
+
+    T2([stock.reserved]) -->|consume| OrderSvc
+    T3([order.paid]) -->|consume| OrderSvc
+    T4([order.shipped]) -->|consume| OrderSvc
+```
+
+**Using it:**
+1. Start all 5 services as usual.
+2. Open **http://localhost:8081** in a browser.
+3. Fill in the order form and click **Place Order**.
+4. Watch the step indicator progress live: `Created → Stock Reserved → Paid → Shipped`, with toast notifications for each transition.
+
+---
+
 ## Scenario Walkthroughs
 
 ### Scenario 1 — Happy Path
@@ -218,7 +247,7 @@ Content-Type: application/json
 ```
 Expected response: `202 Accepted` with `{ "orderId": "...", "status": "PROCESSING" }`
 
-Watch the logs of all 4 downstream services to see the event chain fire in order.
+Watch the logs of all 4 downstream services to see the event chain fire in order — or open **http://localhost:8081** to watch it happen visually on the [live dashboard](#live-dashboard).
 
 ---
 
